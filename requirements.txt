@@ -1,6 +1,2 @@
-fastapi==0.115.0
-uvicorn==0.30.0
-httpx==0.27.2
-pydantic==2.9.0
-python-multipart==0.0.12
-mangum==0.17.0
+# Vercel Python runtime dependencies
+# 使用标准库 urllib，不需要额外依赖
