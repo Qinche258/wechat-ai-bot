@@ -1,0 +1,361 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+    <title>小暖 - AI陪伴助手</title>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", "PingFang SC", "Hiragino Sans GB", "Microsoft YaHei", sans-serif;
+            background: #EDEDED;
+            height: 100vh;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+        }
+
+        /* 手机容器 */
+        .phone {
+            width: 390px;
+            height: 100vh;
+            max-height: 844px;
+            background: #EDEDED;
+            display: flex;
+            flex-direction: column;
+            box-shadow: 0 0 20px rgba(0,0,0,0.1);
+            position: relative;
+        }
+
+        /* 顶部导航栏 */
+        .header {
+            background: #EDEDED;
+            padding: 12px 16px;
+            display: flex;
+            align-items: center;
+            border-bottom: 1px solid #D9D9D9;
+            flex-shrink: 0;
+        }
+
+        .header .avatar {
+            width: 40px;
+            height: 40px;
+            border-radius: 50%;
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 20px;
+            margin-right: 12px;
+        }
+
+        .header .info {
+            flex: 1;
+        }
+
+        .header .name {
+            font-size: 16px;
+            font-weight: 500;
+            color: #000;
+        }
+
+        .header .status {
+            font-size: 12px;
+            color: #07C160;
+        }
+
+        /* 聊天区域 */
+        .chat-area {
+            flex: 1;
+            overflow-y: auto;
+            padding: 16px;
+            background: #EDEDED;
+        }
+
+        /* 时间分割线 */
+        .time-divider {
+            text-align: center;
+            margin: 16px 0;
+            font-size: 12px;
+            color: #999;
+        }
+
+        /* 消息气泡 */
+        .message {
+            display: flex;
+            margin-bottom: 16px;
+            align-items: flex-start;
+        }
+
+        .message.user {
+            flex-direction: row-reverse;
+        }
+
+        .message .avatar {
+            width: 40px;
+            height: 40px;
+            border-radius: 6px;
+            flex-shrink: 0;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 16px;
+        }
+
+        .message.ai .avatar {
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+        }
+
+        .message.user .avatar {
+            background: #07C160;
+            color: white;
+            margin-left: 12px;
+        }
+
+        .message .bubble {
+            max-width: 70%;
+            padding: 10px 14px;
+            border-radius: 6px;
+            font-size: 15px;
+            line-height: 1.5;
+            word-break: break-word;
+        }
+
+        .message.ai .bubble {
+            background: white;
+            margin-left: 12px;
+            border-top-left-radius: 2px;
+        }
+
+        .message.user .bubble {
+            background: #95EC69;
+            margin-right: 12px;
+            border-top-right-radius: 2px;
+        }
+
+        /* 输入区域 */
+        .input-area {
+            background: #F7F7F7;
+            padding: 10px 16px;
+            display: flex;
+            align-items: center;
+            border-top: 1px solid #D9D9D9;
+            flex-shrink: 0;
+        }
+
+        .input-area .input-box {
+            flex: 1;
+            background: white;
+            border: 1px solid #E0E0E0;
+            border-radius: 6px;
+            padding: 8px 12px;
+            font-size: 15px;
+            outline: none;
+            resize: none;
+            max-height: 100px;
+            min-height: 36px;
+            font-family: inherit;
+        }
+
+        .input-area .send-btn {
+            margin-left: 10px;
+            background: #07C160;
+            color: white;
+            border: none;
+            border-radius: 6px;
+            padding: 8px 16px;
+            font-size: 15px;
+            cursor: pointer;
+            flex-shrink: 0;
+        }
+
+        .input-area .send-btn:active {
+            background: #06AD56;
+        }
+
+        .input-area .send-btn:disabled {
+            background: #CCC;
+        }
+
+        /* 打字指示器 */
+        .typing {
+            display: flex;
+            align-items: center;
+            margin-bottom: 16px;
+        }
+
+        .typing .dots {
+            background: white;
+            padding: 12px 16px;
+            border-radius: 6px;
+            margin-left: 12px;
+            border-top-left-radius: 2px;
+        }
+
+        .typing .dot {
+            display: inline-block;
+            width: 8px;
+            height: 8px;
+            background: #999;
+            border-radius: 50%;
+            margin: 0 2px;
+            animation: typing 1.4s infinite;
+        }
+
+        .typing .dot:nth-child(2) { animation-delay: 0.2s; }
+        .typing .dot:nth-child(3) { animation-delay: 0.4s; }
+
+        @keyframes typing {
+            0%, 60%, 100% { transform: translateY(0); }
+            30% { transform: translateY(-8px); }
+        }
+
+        /* 滚动条 */
+        .chat-area::-webkit-scrollbar {
+            width: 4px;
+        }
+
+        .chat-area::-webkit-scrollbar-thumb {
+            background: #CCC;
+            border-radius: 2px;
+        }
+    </style>
+</head>
+<body>
+    <div class="phone">
+        <!-- 顶部栏 -->
+        <div class="header">
+            <div class="avatar">🌸</div>
+            <div class="info">
+                <div class="name">小暖</div>
+                <div class="status">在线</div>
+            </div>
+        </div>
+
+        <!-- 聊天区域 -->
+        <div class="chat-area" id="chatArea">
+            <div class="time-divider">今天 14:40</div>
+            <div class="message ai">
+                <div class="avatar">🌸</div>
+                <div class="bubble">嗨～我是小暖 🌸<br>你的专属AI陪伴助手～<br><br>有什么想聊的，直接说就好 😊</div>
+            </div>
+        </div>
+
+        <!-- 输入区域 -->
+        <div class="input-area">
+            <textarea class="input-box" id="messageInput" placeholder="发消息..." rows="1"></textarea>
+            <button class="send-btn" id="sendBtn">发送</button>
+        </div>
+    </div>
+
+    <script>
+        const chatArea = document.getElementById('chatArea');
+        const messageInput = document.getElementById('messageInput');
+        const sendBtn = document.getElementById('sendBtn');
+        let isWaiting = false;
+
+        // 发送消息
+        async function sendMessage() {
+            const message = messageInput.value.trim();
+            if (!message || isWaiting) return;
+
+            // 添加用户消息到界面
+            addMessage(message, 'user');
+            messageInput.value = '';
+            messageInput.style.height = 'auto';
+            isWaiting = true;
+            sendBtn.disabled = true;
+
+            // 显示打字指示器
+            showTyping();
+
+            try {
+                // 调用后端API
+                const response = await fetch('/test', {
+                    method: 'POST',
+                    headers: { 'Content-Type': 'application/json' },
+                    body: JSON.stringify({
+                        user_id: 'web_user',
+                        message: message
+                    })
+                });
+
+                const data = await response.json();
+                removeTyping();
+                addMessage(data.reply, 'ai');
+            } catch (error) {
+                removeTyping();
+                addMessage('抱歉，我有点懵了，能再说一遍吗？🤔', 'ai');
+            }
+
+            isWaiting = false;
+            sendBtn.disabled = false;
+            messageInput.focus();
+        }
+
+        // 添加消息到聊天区域
+        function addMessage(text, type) {
+            const messageDiv = document.createElement('div');
+            messageDiv.className = `message ${type}`;
+
+            const avatarContent = type === 'ai' ? '🌸' : '我';
+            const avatarClass = type === 'ai' ? 'avatar' : 'avatar';
+            messageDiv.innerHTML = `
+                <div class="${avatarClass}">${avatarContent}</div>
+                <div class="bubble">${text.replace(/\n/g, '<br>')}</div>
+            `;
+
+            chatArea.appendChild(messageDiv);
+            chatArea.scrollTop = chatArea.scrollHeight;
+        }
+
+        // 显示打字指示器
+        function showTyping() {
+            const typingDiv = document.createElement('div');
+            typingDiv.className = 'typing';
+            typingDiv.id = 'typingIndicator';
+            typingDiv.innerHTML = `
+                <div class="avatar" style="background:linear-gradient(135deg,#667eea,#764ba2);">🌸</div>
+                <div class="dots">
+                    <span class="dot"></span>
+                    <span class="dot"></span>
+                    <span class="dot"></span>
+                </div>
+            `;
+            chatArea.appendChild(typingDiv);
+            chatArea.scrollTop = chatArea.scrollHeight;
+        }
+
+        // 移除打字指示器
+        function removeTyping() {
+            const indicator = document.getElementById('typingIndicator');
+            if (indicator) indicator.remove();
+        }
+
+        // 事件监听
+        sendBtn.addEventListener('click', sendMessage);
+        messageInput.addEventListener('keypress', (e) => {
+            if (e.key === 'Enter' && !e.shiftKey) {
+                e.preventDefault();
+                sendMessage();
+            }
+        });
+
+        // 自动调整输入框高度
+        messageInput.addEventListener('input', function() {
+            this.style.height = 'auto';
+            this.style.height = Math.min(this.scrollHeight, 100) + 'px';
+        });
+
+        // 页面加载后自动聚焦输入框
+        window.addEventListener('load', () => {
+            messageInput.focus();
+        });
+    </script>
+</body>
+</html>

@@ -1,0 +1,30 @@
+# .vercelignore
+# 排除不需要部署的文件
+
+# Python 缓存
+__pycache__/
+*.pyc
+*.pyo
+*.pyd
+
+# 数据库文件（Vercel 无状态，需要用外部数据库）
+memory/*.db
+
+# 本地测试文件
+test_*.py
+启动.bat
+重启.bat
+
+# IDE 文件
+.vscode/
+.idea/
+*.swp
+*.swo
+
+# 日志文件
+*.log
+
+# 其他
+.DS_Store
+*.md
+!README_VERCEL.md
